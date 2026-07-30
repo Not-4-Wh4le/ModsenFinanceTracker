@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ModsenFinanceTracker.Application.Common.Interfaces.TransactionFactory;
 
-internal interface ITransactionFactoryResolver
+public interface ITransactionFactoryResolver
 {
     ITransactionFactory GetFactory(TransactionType transactionType);
 }
