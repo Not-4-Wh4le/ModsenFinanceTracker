@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="ModsenFinanceTracker.Application/ModsenFinanceTracker.Application.csproj" Id="b2af3b88-794c-47ca-9705-2ecc6bf02cf0" />
   <Project Path="ModsenFinanceTracker.Domain/ModsenFinanceTracker.Domain.csproj" />
 </Solution>
