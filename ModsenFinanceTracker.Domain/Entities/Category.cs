@@ -1,54 +1,65 @@
-﻿using ModsenFinanceTracker.Domain.Common.Interfaces;
+﻿using ModsenFinanceTracker.Domain.Common;
 using ModsenFinanceTracker.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using ModsenFinanceTracker.Domain.Exceptions;
 
-namespace ModsenFinanceTracker.Domain.Entities
+namespace ModsenFinanceTracker.Domain.Entities;
+
+public class Category : Entity
 {
-    public class Category : IEntity
+    private decimal? _budgetLimit;
+    private string _name;
+
+    public const int MaxNameLength = 50;
+
+    public TransactionType TransactionType { get; init; }
+    public string Name
     {
-        public Guid Id { get; init; }
-        public string Name { get; private set; }
-        public TransactionType TransactionType { get; init; }
-        public decimal? BudgetLimit { get; private set; }
-
-        public Category(Guid id, string name, TransactionType transactionType, decimal budgetLimit)
+        get
         {
-            Id = id;
-            TransactionType = transactionType;
-            SetName(name);
-            SetBudgetLimit(budgetLimit);
+            return _name;
+        }
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new DomainValidationException(nameof(Name), "Name cannot be null or empty");
+            }
+
+            if (value.Length > MaxNameLength)
+            {
+                throw new DomainValidationException(nameof(Name) ,$"Length cannot be longer than {MaxNameLength} characters");
+            }
+            _name = value;
         }
 
-        public void SetName(string name)
+    }
+    public decimal? BudgetLimit
+    {
+        get
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException("Name cannot be null or empty");
-            }
-
-            if (name.Length > 50)
-            {
-                throw new ArgumentException("Name length cannot be longer than 50 characters");
-            }
-
-            Name = name;
+            return _budgetLimit;
         }
-
-        public void SetBudgetLimit(decimal? budgetLimit)
+        set
         {
-            if(budgetLimit.HasValue && budgetLimit < 0)
+            if(value.HasValue && value < 0)
             {
-                throw new ArgumentException("Budget limit must be non-negative");
+                throw new InvalidCategoryBudgetLimitException(value.Value);
             }
 
-            if(TransactionType == TransactionType.Income && budgetLimit.HasValue)
+            if(value.HasValue && TransactionType == TransactionType.Income)
             {
-                throw new InvalidOperationException("Cannot set a budget limit for an income category");
+                throw new BudgetLimitNotAllowedException(Name);
             }
 
-            BudgetLimit = budgetLimit;
+            _budgetLimit = value;
         }
+    }
+
+    public Category(Guid id, string name, TransactionType transactionType, decimal? budgetLimit = null)
+    {
+        Id = id;
+        TransactionType = transactionType;
+        Name = name;
+        BudgetLimit = budgetLimit;
     }
 }

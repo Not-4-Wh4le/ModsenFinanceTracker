@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ModsenFinanceTracker.Domain.Enums;
 
-namespace ModsenFinanceTracker.Domain.Enums
+public enum TransactionType
 {
-    public enum TransactionType
-    {
-        Income,
-        Expense
-    }
+    Income,
+    Expense
 }

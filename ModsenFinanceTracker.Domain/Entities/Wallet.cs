@@ -1,76 +1,51 @@
 ﻿using ModsenFinanceTracker.Domain.Common;
-using ModsenFinanceTracker.Domain.Common.Interfaces;
+using ModsenFinanceTracker.Domain.Enums;
 using ModsenFinanceTracker.Domain.Events;
 using ModsenFinanceTracker.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ModsenFinanceTracker.Domain.Entities
+namespace ModsenFinanceTracker.Domain.Entities;
+
+public class Wallet : AggregateRoot
 {
-    public class Wallet : AggregateRoot
+    private List<Transaction> _transactions = new();
+
+    public decimal Balance => _transactions.Sum(t => t.Contribution());
+    public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
+
+    public void AddTransaction(Transaction transaction)
     {
-        private List<Transaction> _transactions = new();
-
-        public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
-
-        public void AddTransaction(Transaction transaction)
+        if (Balance + transaction.Contribution() < 0)
         {
-            transaction.Apply(this);
+            throw new InsufficientFundsException(Balance, transaction.Amount);
         }
 
-        internal void ApplyIncome(IncomeTransaction transaction)
+        _transactions.Add(transaction);
+        CheckCategoryBudgetLimit(transaction);
+    }
+
+    private void CheckCategoryBudgetLimit(Transaction transaction)
+    {
+        var category = transaction.Category;
+
+        if (category.TransactionType != TransactionType.Expense || !category.BudgetLimit.HasValue)
         {
-            _transactions.Add(transaction);
+            return;
         }
 
-        internal void ApplyExpense(ExpenseTransaction transaction)
+        decimal currentMonthExpenses = _transactions
+            .Where(t => t.Category.Id == category.Id
+                && t.DateTime.Year == transaction.DateTime.Year
+                && t.DateTime.Month == transaction.DateTime.Month)
+            .Sum(t => t.Amount);
+
+        if(currentMonthExpenses > category.BudgetLimit)
         {
-            if(GetBalance() < transaction.Amount)
-            {
-                throw new InsufficientFundsException(GetBalance(), transaction.Amount);
-            }
-            _transactions.Add(transaction);
-            CheckCategoryBudgetLimit(transaction);
-
-        }
-
-        public decimal GetBalance()
-        {
-            decimal income = _transactions
-                .OfType<IncomeTransaction>()
-                .Sum(i => i.Amount);
-
-            decimal expense = _transactions
-                .OfType<ExpenseTransaction>()
-                .Sum(e => e.Amount);
-
-            return income - expense;
-        }
-
-        private void CheckCategoryBudgetLimit(ExpenseTransaction transaction)
-        {
-            var category = transaction.Category;
-            if (!category.BudgetLimit.HasValue)
-            {
-                return;
-            }
-            decimal currentMonthExpenses = _transactions
-                .OfType<ExpenseTransaction>()
-                .Where(e => e.Category.Id == category.Id
-                    && e.DateTime.Year == transaction.DateTime.Year
-                    && e.DateTime.Month == transaction.DateTime.Month)
-                .Sum(e => e.Amount);
-
-            if(currentMonthExpenses > category.BudgetLimit)
-            {
-                AddDomainEvent(
-                    new BudgetLimitExceededEvent(
-                        category, 
-                        currentMonthExpenses, 
-                        category.BudgetLimit.Value, 
-                        DateTime.UtcNow));
-            }
+            AddDomainEvent(
+                new BudgetLimitExceededEvent(
+                    category, 
+                    currentMonthExpenses, 
+                    category.BudgetLimit.Value, 
+                    DateTime.UtcNow));
         }
     }
 }

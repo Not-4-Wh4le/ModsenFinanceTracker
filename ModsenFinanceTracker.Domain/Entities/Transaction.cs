@@ -1,52 +1,53 @@
-﻿using ModsenFinanceTracker.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ModsenFinanceTracker.Domain.Common;
+using ModsenFinanceTracker.Domain.Exceptions;
 
-namespace ModsenFinanceTracker.Domain.Entities
+namespace ModsenFinanceTracker.Domain.Entities;
+
+public abstract class Transaction : Entity
 {
-    public abstract class Transaction : IEntity
+    private string _description;
+
+    public const int MaxDescriptionLength = 200;
+
+    public decimal Amount { get; init; }
+    public DateTime DateTime { get; init; }
+    public Category Category { get; init; }
+    public string Description
     {
-        public Guid Id { get; init; }
-        public decimal Amount { get; init; }
-        public DateTime DateTime { get; init; }
-        public Category Category { get; init; }
-        public string Description { get; private set; }
-
-        protected Transaction(
-            Guid id, 
-            decimal amount,  
-            Category category, 
-            string desctiption, 
-            DateTime? dateTime = null)
+        get
         {
-            if (amount <= 0)
-            {
-                throw new ArgumentException("Transaction amount must be non-negative");
-            }
-            
-            Id = id;
-            Amount = amount;
-            Category = category
-                ?? throw new ArgumentNullException("Category cannot be null");
-            DateTime = dateTime ?? DateTime.UtcNow;
-            SetDescription(desctiption);
-           
+            return _description;
         }
-
-        public abstract void Apply(Wallet wallet);
-
-        public void SetDescription(string description)
+        set
         {
-            description ??= string.Empty;
-            
-            if(description.Length > 200)
-            {
-                throw new ArgumentException("Description length cannot be longer than 200 characters");
-            }
-            
-            Description = description;
-        }
 
+            if (value.Length > MaxDescriptionLength)
+            {
+                throw new DomainValidationException(nameof(Description) ,$"Length cannot be longer than {MaxDescriptionLength} characters");
+            }
+            _description = value;
+        }
     }
+
+    protected Transaction(
+        Guid id, 
+        decimal amount,  
+        Category category, 
+        string description, 
+        DateTime? dateTime = null)
+    {
+        if (amount <= 0)
+        {
+            throw new InvalidTransactionAmountException(amount);
+        }
+        
+        Id = id;
+        Amount = amount;
+        Category = category
+            ?? throw new ArgumentNullException("Category cannot be null");
+        DateTime = dateTime ?? DateTime.UtcNow;
+        Description = description;
+    }
+
+    public abstract decimal Contribution();
 }
