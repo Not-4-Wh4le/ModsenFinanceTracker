@@ -23,6 +23,30 @@ public class Wallet : AggregateRoot
         CheckCategoryBudgetLimit(transaction);
     }
 
+    public void RemoveTransaction(Guid id)
+    {
+        var transaction = _transactions.FirstOrDefault(t => t.Id == id);
+
+        if (transaction == null)
+        {
+            return;
+        }
+
+        _transactions.Remove(transaction);
+    }
+
+    public void UpdateTransactionDescription(Guid id, string newDescription)
+    {
+        var transaction = _transactions.FirstOrDefault(t => t.Id == id);
+
+        if (transaction == null)
+        {
+            return;
+        }
+
+        transaction.Description = newDescription;
+    }
+
     private void CheckCategoryBudgetLimit(Transaction transaction)
     {
         var category = transaction.Category;
