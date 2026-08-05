@@ -7,7 +7,7 @@ namespace ModsenFinanceTracker.Application.Common.Interfaces.Repositories
 {
     public interface IWalletRepository
     {
-        Task<Wallet?> GetAsync(CancellationToken cancellationToken = default);
+        Task<Wallet?> GetAsync(Guid Id, CancellationToken cancellationToken = default);
         Task SaveAsync(Wallet wallet, CancellationToken cancellationToken = default);
     }
 }
