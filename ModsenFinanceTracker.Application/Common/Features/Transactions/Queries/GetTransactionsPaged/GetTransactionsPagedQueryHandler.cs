@@ -1,9 +1,6 @@
 ﻿using MediatR;
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
 using ModsenFinanceTracker.Application.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ModsenFinanceTracker.Application.Common.Features.Transactions.Queries.GetTransactionsPaged;
 
