@@ -21,11 +21,19 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
 
     public async Task<Guid> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
     {
-        var wallet = await _walletRepository.GetAsync(request.WalletId, cancellationToken)
-            ?? throw new InvalidOperationException("Wallet not found");
+        var wallet = await _walletRepository.GetAsync(request.WalletId, cancellationToken);
 
-        var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken)
-            ?? throw new InvalidOperationException("Category not found");
+        if (wallet == null)
+        {
+            return Guid.Empty;
+        }
+
+        var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
+
+        if (category == null)
+        {
+            return Guid.Empty;
+        }
 
         var factory = _transactionFactoryResolver.GetFactory(request.Type);
 
