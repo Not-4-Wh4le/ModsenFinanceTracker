@@ -14,7 +14,7 @@ public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransaction
 
     public async Task Handle(UpdateTransactionCommand request, CancellationToken cancellationToken)
     {
-        var wallet = await _walletRepository.GetAsync(request.WalletId);
+        var wallet = await _walletRepository.GetAsync(request.WalletId, cancellationToken);
 
         if (wallet == null)
         {
@@ -23,6 +23,6 @@ public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransaction
 
         wallet.UpdateTransactionDescription(request.TransactionId, request.NewDescription);
 
-        await _walletRepository.SaveAsync(wallet);
+        await _walletRepository.SaveAsync(wallet, cancellationToken);
     }
 }

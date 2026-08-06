@@ -6,6 +6,7 @@ namespace ModsenFinanceTracker.Application.Common.Features.Transactions.Commands
 public record CreateTransactionCommand(
     TransactionType Type,
     decimal Amount,
+    Guid WalletId,
     Guid CategoryId,
     string Description,
     DateTime? DateTime = null)

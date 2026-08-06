@@ -22,6 +22,6 @@ public class DeleteTransactionCommandHandler : IRequestHandler<DeleteTransaction
         }
 
         wallet.RemoveTransaction(request.TransactionId);
-        await _walletRepository.SaveAsync(wallet);
+        await _walletRepository.SaveAsync(wallet, cancellationToken);
     }
 }

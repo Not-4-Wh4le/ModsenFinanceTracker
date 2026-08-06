@@ -21,7 +21,7 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
 
     public async Task<Guid> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
     {
-        var wallet = await _walletRepository.GetAsync(cancellationToken)
+        var wallet = await _walletRepository.GetAsync(request.WalletId, cancellationToken)
             ?? throw new InvalidOperationException("Wallet not found");
 
         var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken)
