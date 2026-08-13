@@ -2,6 +2,8 @@
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
 using ModsenFinanceTracker.Infrastructure.InMemoryStorage;
 using ModsenFinanceTracker.Infrastructure.InMemoryStorage.Repositories;
+using ModsenFinanceTracker.Infrastructure.JsonStorage;
+using ModsenFinanceTracker.Infrastructure.JsonStorage.Repositories;
 
 namespace ModsenFinanceTracker.Infrastructure;
 
@@ -9,11 +11,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddSingleton<InMemoryDbContext>();
+        services.AddSingleton<JsonDbContext>();
 
-        services.AddSingleton<IWalletRepository, InMemoryWalletRepository>();
-        services.AddSingleton<ICategoryRepository, InMemoryCategoryRepository>();
-        services.AddSingleton<ITransactionRepository, InMemoryTransactionRepository>();
+        services.AddSingleton<IWalletRepository, JsonWalletRepository>();
+        services.AddSingleton<ICategoryRepository, JsonCategoryRepository>();
+        services.AddSingleton<ITransactionRepository, JsonTransactionRepository>();
 
         return services;
     }
