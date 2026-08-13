@@ -1,10 +1,12 @@
 ﻿using ModsenFinanceTracker.Domain.Entities;
+using ModsenFinanceTracker.Domain.Enums;
 
 namespace ModsenFinanceTracker.Application.Common.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
         Task<(IReadOnlyCollection<Category>, int TotalCount)> GetPagedAsync(
+            TransactionType? transactionType,
             int pageNumber,
             int pageSize,
             CancellationToken cancellationToken = default);
