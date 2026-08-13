@@ -4,6 +4,7 @@ using ModsenFinanceTracker.Application.Common.Models;
 namespace ModsenFinanceTracker.Application.Common.Features.Transactions.Queries.GetTransactionsPaged;
 
 public record GetTransactionsPagedQuery(
+    Guid? WalletId = null,
     DateTime? StartDate = null,
     DateTime? EndDate = null,
     int PageNumber = 1,
