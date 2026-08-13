@@ -20,6 +20,7 @@ public class GetCategoriesPagedQueryHandler
     public async Task<PagedResultDto<CategoryDto>> Handle(GetCategoriesPagedQuery request, CancellationToken cancellationToken)
     {
         var (categories, totalCount) = await _categoryRepository.GetPagedAsync(
+            request.TransactionType,
             request.PageNumber,
             request.PageSize,
             cancellationToken);
