@@ -13,13 +13,24 @@ public class JsonTransactionRepository : ITransactionRepository
     }
 
     public Task<(IReadOnlyCollection<Transaction>, int TotalCount)> GetPagedAsync(
+        Guid? walletId,
         DateTime? startDate,
         DateTime? endDate,
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.Transactions.AsEnumerable();
+        IEnumerable<Transaction> query;
+
+        if (walletId.HasValue && walletId.Value != Guid.Empty)
+        {
+            var wallet = _context.Wallets.FirstOrDefault(w => w.Id == walletId.Value);
+            query = wallet?.Transactions ?? Enumerable.Empty<Transaction>();
+        }
+        else
+        {
+            query = _context.Wallets.SelectMany(w => w.Transactions);
+        }
 
         if (startDate.HasValue)
         {

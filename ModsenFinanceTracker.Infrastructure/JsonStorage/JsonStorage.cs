@@ -120,21 +120,16 @@ public class JsonDbContext
                     Name = w.Name
                 }).ToList(),
 
-                Transactions = Transactions.Select(t =>
+                Transactions = Wallets.SelectMany(w => w.Transactions.Select(t => new TransactionDataModel
                 {
-                    var wallet = Wallets.FirstOrDefault(w => w.Transactions.Any(tr => tr.Id == t.Id));
-
-                    return new TransactionDataModel
-                    {
-                        Id = t.Id,
-                        TransactionType = t.Category.TransactionType.ToString(),
-                        Amount = t.Amount,
-                        WalletId = wallet?.Id ?? Guid.Empty,
-                        CategoryId = t.Category.Id,
-                        Description = t.Description,
-                        DateTime = t.DateTime
-                    };
-                }).ToList()
+                    Id = t.Id,
+                    TransactionType = t.Category.TransactionType.ToString(),
+                    Amount = t.Amount,
+                    WalletId = w.Id,
+                    CategoryId = t.Category.Id,
+                    Description = t.Description,
+                    DateTime = t.DateTime
+                })).ToList()
             };
 
             var json = JsonSerializer.Serialize(snapshot, _jsonOptions);
