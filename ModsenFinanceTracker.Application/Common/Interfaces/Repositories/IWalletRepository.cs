@@ -10,5 +10,6 @@ namespace ModsenFinanceTracker.Application.Common.Interfaces.Repositories
             int pageSize,
             CancellationToken cancellationToken = default);
         Task SaveAsync(Wallet wallet, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }
