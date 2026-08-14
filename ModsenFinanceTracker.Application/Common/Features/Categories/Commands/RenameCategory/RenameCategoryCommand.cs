@@ -2,5 +2,7 @@
 
 namespace ModsenFinanceTracker.Application.Common.Features.Categories.Commands.UpdateCategory;
 
-public record UpdateCategoryCommand(Guid Id, string Name, decimal BudgetLimit)
+public record RenameCategoryCommand(
+    Guid Id, 
+    string NewName)
     : IRequest;
