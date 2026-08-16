@@ -5,7 +5,7 @@ using ModsenFinanceTracker.Application.Common.Models;
 namespace ModsenFinanceTracker.Application.Common.Features.Wallets.Queries.GetWalletsPaged;
 
 public class GetWalletsPagedQueryHandler
-    : IRequestHandler<GetWalletsPagedQuery, PagedResultDto<WalletDto>>
+    : IRequestHandler<GetWalletsPagedQuery, PagedResult<WalletDto>>
 {
     private readonly IWalletRepository _walletRepository;
 
@@ -14,7 +14,7 @@ public class GetWalletsPagedQueryHandler
         _walletRepository = walletRepository;
     }
 
-    public async Task<PagedResultDto<WalletDto>> Handle(GetWalletsPagedQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResult<WalletDto>> Handle(GetWalletsPagedQuery request, CancellationToken cancellationToken)
     {
         var (wallets, totalCount) = await _walletRepository.GetPagedAsync(
             request.PageNumber,
@@ -25,7 +25,7 @@ public class GetWalletsPagedQueryHandler
             .Select(w => new WalletDto(w.Id, w.Name))
             .ToList();
 
-        return new PagedResultDto<WalletDto>(
+        return new PagedResult<WalletDto>(
             items,
             totalCount,
             request.PageNumber,

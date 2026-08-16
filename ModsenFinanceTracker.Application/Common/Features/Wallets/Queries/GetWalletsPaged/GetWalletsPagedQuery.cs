@@ -6,4 +6,4 @@ namespace ModsenFinanceTracker.Application.Common.Features.Wallets.Queries.GetWa
 public record GetWalletsPagedQuery(
     int PageNumber = 1,
     int PageSize = 10)
-    : IRequest<PagedResultDto<WalletDto>>;
+    : IRequest<PagedResult<WalletDto>>;

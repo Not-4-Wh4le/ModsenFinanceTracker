@@ -5,7 +5,7 @@ using ModsenFinanceTracker.Application.Common.Models;
 namespace ModsenFinanceTracker.Application.Common.Features.Categories.Queries.GetCategoriesPaged;
 
 public class GetCategoriesPagedQueryHandler
-    : IRequestHandler<GetCategoriesPagedQuery, PagedResultDto<CategoryDto>>
+    : IRequestHandler<GetCategoriesPagedQuery, PagedResult<CategoryDto>>
 {
     private readonly ICategoryRepository _categoryRepository;
 
@@ -14,7 +14,7 @@ public class GetCategoriesPagedQueryHandler
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<PagedResultDto<CategoryDto>> Handle(GetCategoriesPagedQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResult<CategoryDto>> Handle(GetCategoriesPagedQuery request, CancellationToken cancellationToken)
     {
         var (categories, totalCount) = await _categoryRepository.GetPagedAsync(
             request.TransactionType,
@@ -30,7 +30,7 @@ public class GetCategoriesPagedQueryHandler
                 c.BudgetLimit))
             .ToList();
 
-        var result = new PagedResultDto<CategoryDto>(
+        var result = new PagedResult<CategoryDto>(
             items,
             totalCount,
             request.PageNumber,

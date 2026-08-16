@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ModsenFinanceTracker.Application.Common.Models;
 
-public record PagedResultDto<T>(
+public record PagedResult<T>(
         IReadOnlyList<T> Items,
         int TotalCount,
         int PageNumber,

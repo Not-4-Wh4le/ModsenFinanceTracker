@@ -11,4 +11,4 @@ public record GetTransactionsPagedQuery(
     DateTime? EndDate = null,
     int PageNumber = 1,
     int PageSize = 10)
-    : IRequest<PagedResultDto<TransactionDto>>;
+    : IRequest<PagedResult<TransactionDto>>;
