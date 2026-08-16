@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using ModsenFinanceTracker.Application.Common.Exceptions;
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
+using ModsenFinanceTracker.Domain.Entities;
 
 namespace ModsenFinanceTracker.Application.Common.Features.Categories.Commands.SetCategoryBudget;
 
@@ -15,17 +17,8 @@ public class SetCategoryBudgetCommandHandler
 
     public async Task Handle(SetCategoryBudgetCommand request, CancellationToken cancellationToken)
     {
-        var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken);
-
-        if(category == null)
-        {
-            return;
-        }
-
-        if(category.BudgetLimit == request.NewLimit)
-        {
-            return;
-        }
+        var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken)
+            ?? throw new NotFoundException(nameof(Category), request.Id);
 
         category.BudgetLimit = request.NewLimit;
 
