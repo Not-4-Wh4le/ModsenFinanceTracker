@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ModsenFinanceTracker.Application.Common.Models;
+﻿namespace ModsenFinanceTracker.Application.Common.Models;
 
 public record PagedResult<T>(
         IReadOnlyList<T> Items,
