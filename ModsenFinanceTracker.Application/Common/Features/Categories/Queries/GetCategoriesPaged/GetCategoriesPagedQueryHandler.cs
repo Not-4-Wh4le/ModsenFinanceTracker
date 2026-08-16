@@ -16,13 +16,13 @@ public class GetCategoriesPagedQueryHandler
 
     public async Task<PagedResult<CategoryDto>> Handle(GetCategoriesPagedQuery request, CancellationToken cancellationToken)
     {
-        var (categories, totalCount) = await _categoryRepository.GetPagedAsync(
+        var pagedCategories = await _categoryRepository.GetPagedAsync(
             request.TransactionType,
             request.PageNumber,
             request.PageSize,
             cancellationToken);
 
-        var items = categories
+        var dtos = pagedCategories.Items
             .Select(c => new CategoryDto(
                 c.Id,
                 c.Name,
@@ -31,10 +31,10 @@ public class GetCategoriesPagedQueryHandler
             .ToList();
 
         var result = new PagedResult<CategoryDto>(
-            items,
-            totalCount,
-            request.PageNumber,
-            request.PageSize);
+            dtos,
+            pagedCategories.TotalCount,
+            pagedCategories.PageNumber,
+            pagedCategories.PageSize);
 
         return result;
     }

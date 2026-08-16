@@ -16,19 +16,19 @@ public class GetWalletsPagedQueryHandler
 
     public async Task<PagedResult<WalletDto>> Handle(GetWalletsPagedQuery request, CancellationToken cancellationToken)
     {
-        var (wallets, totalCount) = await _walletRepository.GetPagedAsync(
+        var pagedWallets = await _walletRepository.GetPagedAsync(
             request.PageNumber,
             request.PageSize,
             cancellationToken);
 
-        var items = wallets
+        var items = pagedWallets.Items
             .Select(w => new WalletDto(w.Id, w.Name))
             .ToList();
 
         return new PagedResult<WalletDto>(
             items,
-            totalCount,
-            request.PageNumber,
-            request.PageSize);
+            pagedWallets.TotalCount,
+            pagedWallets.PageNumber,
+            pagedWallets.PageSize);
     }
 }

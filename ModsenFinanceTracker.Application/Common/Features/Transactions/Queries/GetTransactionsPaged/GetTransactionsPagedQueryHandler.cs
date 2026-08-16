@@ -15,7 +15,7 @@ public class GetTransactionsPagedQueryHandler : IRequestHandler<GetTransactionsP
 
     public async Task<PagedResult<TransactionDto>> Handle(GetTransactionsPagedQuery request, CancellationToken cancellationToken)
     {
-        var (transactions, count) = await _transactionRepository.GetPagedAsync(
+        var pagedTransactions = await _transactionRepository.GetPagedAsync(
             request.WalletId,
             request.TransactionType,
             request.StartDate,
@@ -24,15 +24,21 @@ public class GetTransactionsPagedQueryHandler : IRequestHandler<GetTransactionsP
             request.PageSize,
             cancellationToken);
 
-        var dtos = transactions.Select(t => new TransactionDto(
-            t.Id,
-            t.Amount,
-            t.Category.TransactionType.ToString(),
-            t.Category.Name,
-            t.Description,
-            t.DateTime)).ToList();
+        var dtos = pagedTransactions.Items
+            .Select(t => new TransactionDto(
+                t.Id,
+                t.Amount,
+                t.Category.TransactionType.ToString(),
+                t.Category.Name,
+                t.Description,
+                t.DateTime))
+            .ToList();
 
-        var result = new PagedResult<TransactionDto>(dtos, count, request.PageNumber, request.PageSize);
+        var result = new PagedResult<TransactionDto>(
+            dtos,
+            pagedTransactions.TotalCount,
+            pagedTransactions.PageNumber,
+            pagedTransactions.PageSize);
 
         return result;
     }
