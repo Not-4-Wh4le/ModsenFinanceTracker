@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using ModsenFinanceTracker.Application.Common.Exceptions;
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
+using ModsenFinanceTracker.Domain.Entities;
 
 namespace ModsenFinanceTracker.Application.Common.Features.Wallets.Queries.GetWalletDetails;
 
@@ -15,12 +17,8 @@ public class GetWalletDetailsQueryHandler
 
     public async Task<WalletDetailsDto?> Handle(GetWalletDetailsQuery request, CancellationToken cancellationToken)
     {
-        var wallet = await _walletRepository.GetAsync(request.Id, cancellationToken);
-
-        if (wallet == null)
-        {
-            return null;
-        }
+        var wallet = await _walletRepository.GetAsync(request.Id, cancellationToken)
+            ?? throw new NotFoundException(nameof(Wallet), request.Id); 
 
         return new WalletDetailsDto(
             wallet.Id,
