@@ -4,7 +4,7 @@ using ModsenFinanceTracker.Application.Common.Models;
 
 namespace ModsenFinanceTracker.Application.Common.Features.Transactions.Queries.GetTransactionsPaged;
 
-public class GetTransactionsPagedQueryHandler : IRequestHandler<GetTransactionsPagedQuery, PagedResultDto<TransactionDto>>
+public class GetTransactionsPagedQueryHandler : IRequestHandler<GetTransactionsPagedQuery, PagedResult<TransactionDto>>
 {
     private readonly ITransactionRepository _transactionRepository;
     
@@ -13,24 +13,32 @@ public class GetTransactionsPagedQueryHandler : IRequestHandler<GetTransactionsP
         _transactionRepository = transactionRepository;
     }
 
-    public async Task<PagedResultDto<TransactionDto>> Handle(GetTransactionsPagedQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResult<TransactionDto>> Handle(GetTransactionsPagedQuery request, CancellationToken cancellationToken)
     {
-        var (transactions, count) = await _transactionRepository.GetPagedAsync(
+        var pagedTransactions = await _transactionRepository.GetPagedAsync(
+            request.WalletId,
+            request.TransactionType,
             request.StartDate,
             request.EndDate,
             request.PageNumber,
             request.PageSize,
             cancellationToken);
 
-        var dtos = transactions.Select(t => new TransactionDto(
-            t.Id,
-            t.Amount,
-            t.Category.TransactionType.ToString(),
-            t.Category.Name,
-            t.Description,
-            t.DateTime)).ToList();
+        var dtos = pagedTransactions.Items
+            .Select(t => new TransactionDto(
+                t.Id,
+                t.Amount,
+                t.Category.TransactionType.ToString(),
+                t.Category.Name,
+                t.Description,
+                t.DateTime))
+            .ToList();
 
-        var result = new PagedResultDto<TransactionDto>(dtos, count, request.PageNumber, request.PageSize);
+        var result = new PagedResult<TransactionDto>(
+            dtos,
+            pagedTransactions.TotalCount,
+            pagedTransactions.PageNumber,
+            pagedTransactions.PageSize);
 
         return result;
     }

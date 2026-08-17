@@ -2,15 +2,46 @@
 using ModsenFinanceTracker.Domain.Enums;
 using ModsenFinanceTracker.Domain.Events;
 using ModsenFinanceTracker.Domain.Exceptions;
+using System.Xml.Linq;
 
 namespace ModsenFinanceTracker.Domain.Entities;
 
 public class Wallet : AggregateRoot
 {
+    private string _name;
     private List<Transaction> _transactions = new();
+
+    public const int MaxNameLength = 50;
 
     public decimal Balance => _transactions.Sum(t => t.Contribution());
     public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
+    public string Name
+    {
+        get
+        {
+            return _name;
+        }
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new DomainValidationException(nameof(Name), "Name cannot be null or empty");
+            }
+
+            if (value.Length > MaxNameLength)
+            {
+                throw new DomainValidationException(nameof(Name), $"Length cannot be longer than {MaxNameLength} characters");
+            }
+            _name = value;
+        }
+
+    }
+
+    public Wallet(Guid id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
 
     public void AddTransaction(Transaction transaction)
     {
