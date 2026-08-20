@@ -21,17 +21,16 @@ public class GetCategoryExpensesAnalyticsQueryHandler
         GetCategoryExpensesAnalyticsQuery request,
         CancellationToken cancellationToken)
     {
-        var (transactions, _) = await _transactionRepository.GetPagedAsync(
+        var transactions = await _transactionRepository.GetPagedAsync(
             request.WalletId,
+            TransactionType.Expense,
             request.StartDate,
             request.EndDate,
             pageNumber: 1,
             pageSize: int.MaxValue,
             cancellationToken: cancellationToken);
 
-        var expenses = transactions
-            .Where(t => t.Category.TransactionType == TransactionType.Expense)
-            .ToList();
+        var expenses = transactions.Items;
 
         var totalExpenseSum = expenses.Sum(t => t.Amount);
 
