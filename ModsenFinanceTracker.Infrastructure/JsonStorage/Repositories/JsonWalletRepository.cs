@@ -1,4 +1,5 @@
 ﻿using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
+using ModsenFinanceTracker.Application.Common.Models;
 using ModsenFinanceTracker.Domain.Entities;
 
 namespace ModsenFinanceTracker.Infrastructure.JsonStorage.Repositories;
@@ -18,19 +19,36 @@ public class JsonWalletRepository : IWalletRepository
         return Task.FromResult(wallet);
     }
 
-    public Task<(IReadOnlyCollection<Wallet>, int TotalCount)> GetPagedAsync(
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var wallet = _context.Wallets.FirstOrDefault(w => w.Id == id);
+        if (wallet != null)
+        {
+            _context.Wallets.Remove(wallet);
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public Task<PagedResult<Wallet>> GetPagedAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         var totalCount = _context.Wallets.Count;
 
-        var wallets = _context.Wallets
+        var items = _context.Wallets
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToList();
+        
+        var result = new PagedResult<Wallet>(
+            items,
+            totalCount,
+            pageNumber,
+            pageSize);
 
-        return Task.FromResult<(IReadOnlyCollection<Wallet>, int)>((wallets, totalCount));
+        return Task.FromResult(result);
     }
 
     public async Task SaveAsync(Wallet wallet, CancellationToken cancellationToken = default)

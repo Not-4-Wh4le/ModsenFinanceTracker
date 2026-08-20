@@ -1,4 +1,5 @@
 ﻿using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
+using ModsenFinanceTracker.Application.Common.Models;
 using ModsenFinanceTracker.Domain.Entities;
 using ModsenFinanceTracker.Domain.Enums;
 
@@ -30,7 +31,7 @@ public class JsonCategoryRepository : ICategoryRepository
         return Task.FromResult(category);
     }
 
-    public Task<(IReadOnlyCollection<Category>, int TotalCount)> GetPagedAsync(
+    public Task<PagedResult<Category>> GetPagedAsync(
         TransactionType? transactionType,
         int pageNumber,
         int pageSize,
@@ -45,12 +46,18 @@ public class JsonCategoryRepository : ICategoryRepository
 
         var totalCount = query.Count();
 
-        var categories = query
+        var items = query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
-        return Task.FromResult<(IReadOnlyCollection<Category>, int)>((categories, totalCount));
+        var result = new PagedResult<Category>(
+            items,
+            totalCount,
+            pageNumber,
+            pageSize);
+
+        return Task.FromResult(result);
     }
 
     public async Task SaveAsync(Category category, CancellationToken cancellationToken = default)

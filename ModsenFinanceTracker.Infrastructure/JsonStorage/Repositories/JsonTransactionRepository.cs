@@ -1,5 +1,7 @@
 ﻿using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
+using ModsenFinanceTracker.Application.Common.Models;
 using ModsenFinanceTracker.Domain.Entities;
+using ModsenFinanceTracker.Domain.Enums;
 
 namespace ModsenFinanceTracker.Infrastructure.JsonStorage.Repositories;
 
@@ -12,8 +14,9 @@ public class JsonTransactionRepository : ITransactionRepository
         _context = context;
     }
 
-    public Task<(IReadOnlyCollection<Transaction>, int TotalCount)> GetPagedAsync(
+    public Task<PagedResult<Transaction>> GetPagedAsync(
         Guid? walletId,
+        TransactionType? transactionType,
         DateTime? startDate,
         DateTime? endDate,
         int pageNumber,
@@ -30,6 +33,11 @@ public class JsonTransactionRepository : ITransactionRepository
         else
         {
             query = _context.Wallets.SelectMany(w => w.Transactions);
+        }
+
+        if (transactionType.HasValue)
+        {
+            query = query.Where(t => t.Category.TransactionType == transactionType.Value);
         }
 
         if (startDate.HasValue)
@@ -51,6 +59,12 @@ public class JsonTransactionRepository : ITransactionRepository
             .Take(pageSize)
             .ToList();
 
-        return Task.FromResult<(IReadOnlyCollection<Transaction>, int)>((items, totalCount));
+        var result = new PagedResult<Transaction>(
+            items,
+            totalCount,
+            pageNumber,
+            pageSize);
+
+        return Task.FromResult(result);
     }
 }
