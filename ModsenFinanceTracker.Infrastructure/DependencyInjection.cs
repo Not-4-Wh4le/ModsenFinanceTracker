@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
-using ModsenFinanceTracker.Infrastructure.InMemoryStorage;
-using ModsenFinanceTracker.Infrastructure.InMemoryStorage.Repositories;
 using ModsenFinanceTracker.Infrastructure.JsonStorage;
 using ModsenFinanceTracker.Infrastructure.JsonStorage.Repositories;
 
