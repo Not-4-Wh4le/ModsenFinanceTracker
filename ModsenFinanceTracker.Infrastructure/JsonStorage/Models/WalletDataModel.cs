@@ -1,7 +1,4 @@
 ﻿namespace ModsenFinanceTracker.Infrastructure.JsonStorage.Models;
 
-public class WalletDataModel
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-}
+public record WalletDataModel(Guid Id, string Name);
+
