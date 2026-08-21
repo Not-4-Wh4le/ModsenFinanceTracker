@@ -53,10 +53,6 @@ public static class JsonDbContextSeeder
         wallet.AddTransaction(expenseTransaction1);
         wallet.AddTransaction(expenseTransaction2);
 
-        context.Transactions.Add(incomeTransaction);
-        context.Transactions.Add(expenseTransaction1);
-        context.Transactions.Add(expenseTransaction2);
-
         context.Wallets.Add(wallet);
 
         await context.SaveChangesAsync(cancellationToken);
