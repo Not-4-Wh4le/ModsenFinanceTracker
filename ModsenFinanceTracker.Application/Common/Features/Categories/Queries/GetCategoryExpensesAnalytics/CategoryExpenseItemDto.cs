@@ -4,6 +4,5 @@ public record CategoryExpenseItemDto(
     Guid CategoryId,
     string CategoryName,
     decimal TotalAmount,
-    double Percentage
-);
+    double Percentage);
 

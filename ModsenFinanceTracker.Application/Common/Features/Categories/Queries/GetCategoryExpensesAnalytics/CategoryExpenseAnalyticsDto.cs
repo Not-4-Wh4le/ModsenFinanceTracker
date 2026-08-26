@@ -2,5 +2,4 @@
 
 public record CategoryExpenseAnalyticsDto(
     decimal TotalExpenseSum,
-    IReadOnlyCollection<CategoryExpenseItemDto> Items
-);
+    IReadOnlyCollection<CategoryExpenseItemDto> Items);

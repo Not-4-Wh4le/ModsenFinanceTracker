@@ -5,5 +5,5 @@ namespace ModsenFinanceTracker.Application.Common.Features.Categories.Queries.Ge
 public record GetCategoryExpensesAnalyticsQuery(
     Guid? WalletId = null,
     DateTime? StartDate = null,
-    DateTime? EndDate = null
-) : IRequest<CategoryExpenseAnalyticsDto>;
+    DateTime? EndDate = null) 
+    : IRequest<CategoryExpenseAnalyticsDto>;
