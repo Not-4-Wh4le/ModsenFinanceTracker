@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
+using ModsenFinanceTracker.Application.Common.Interfaces.Services;
 using ModsenFinanceTracker.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,52 +11,22 @@ namespace ModsenFinanceTracker.Application.Common.Features.Categories.Queries.Ge
 public class GetCategoryExpensesAnalyticsQueryHandler
     : IRequestHandler<GetCategoryExpensesAnalyticsQuery, CategoryExpenseAnalyticsDto>
 {
-    private readonly ITransactionRepository _transactionRepository;
+    private readonly ICategoryAnalyticsReadService _categoryAnalyticsReadService;
 
-    public GetCategoryExpensesAnalyticsQueryHandler(ITransactionRepository transactionRepository)
+    public GetCategoryExpensesAnalyticsQueryHandler(ICategoryAnalyticsReadService categoryAnalyticsReadService)
     {
-        _transactionRepository = transactionRepository;
+        _categoryAnalyticsReadService = categoryAnalyticsReadService;
     }
 
-    public async Task<CategoryExpenseAnalyticsDto> Handle(
+    public Task<CategoryExpenseAnalyticsDto> Handle(
         GetCategoryExpensesAnalyticsQuery request,
         CancellationToken cancellationToken)
     {
-        var transactions = await _transactionRepository.GetPagedAsync(
+        return _categoryAnalyticsReadService.GetCategoryExpensesSummaryAsync(
             request.WalletId,
-            TransactionType.Expense,
             request.StartDate,
             request.EndDate,
-            pageNumber: 1,
-            pageSize: int.MaxValue,
-            cancellationToken: cancellationToken);
-
-        var expenses = transactions.Items;
-
-        var totalExpenseSum = expenses.Sum(t => t.Amount);
-
-        if (totalExpenseSum == 0)
-        {
-            return new CategoryExpenseAnalyticsDto(0, Array.Empty<CategoryExpenseItemDto>());
-        }
-
-        var items = expenses
-            .GroupBy(t => new { t.Category.Id, t.Category.Name })
-            .Select(g =>
-            {
-                var categorySum = g.Sum(t => t.Amount);
-                var percentage = (double)(categorySum / totalExpenseSum * 100);
-
-                return new CategoryExpenseItemDto(
-                    g.Key.Id,
-                    g.Key.Name,
-                    categorySum,
-                    Math.Round(percentage, 2)
-                );
-            })
-            .OrderByDescending(i => i.TotalAmount)
-            .ToList();
-
-        return new CategoryExpenseAnalyticsDto(totalExpenseSum, items);
+            cancellationToken);
+        ;
     }
 }
