@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using ModsenFinanceTracker.Application.Common.Behavior;
 using ModsenFinanceTracker.Application.Common.Interfaces.TransactionFactory;
 using ModsenFinanceTracker.Application.Common.TransactionFactoryImpl;
 using System.Reflection;
@@ -18,6 +20,7 @@ public static class DependencyInjection
         services.AddMediatR(conf =>
         {
             conf.RegisterServicesFromAssemblies(assembly);
+            conf.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidatorBehavior<,>));
         });
 
         return services;
