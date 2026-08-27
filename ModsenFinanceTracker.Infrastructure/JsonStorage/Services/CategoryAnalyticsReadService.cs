@@ -45,7 +45,7 @@ public class CategoryAnalyticsReadService : ICategoryAnalyticsReadService
                     g.Key.Id,
                     g.Key.Name,
                     categorySum,
-                    percentage);
+                    Math.Round(percentage, 2));
             })
             .OrderByDescending(i => i.TotalAmount)
             .ToList();
