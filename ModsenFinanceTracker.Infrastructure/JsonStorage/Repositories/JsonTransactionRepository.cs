@@ -2,6 +2,7 @@
 using ModsenFinanceTracker.Application.Common.Models;
 using ModsenFinanceTracker.Domain.Entities;
 using ModsenFinanceTracker.Domain.Enums;
+using System.Runtime.CompilerServices;
 
 namespace ModsenFinanceTracker.Infrastructure.JsonStorage.Repositories;
 
@@ -66,5 +67,48 @@ public class JsonTransactionRepository : ITransactionRepository
             pageSize);
 
         return Task.FromResult(result);
+    }
+
+    public async IAsyncEnumerable<Transaction> GetTransactionsAsync(
+        Guid? walletId, 
+        TransactionType? transactionType, 
+        DateTime? startDate, 
+        DateTime? endDate,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Transaction> query;
+       
+        if (walletId.HasValue && walletId.Value != Guid.Empty)
+        {
+            var wallet = _context.Wallets.FirstOrDefault(w => w.Id == walletId.Value);
+            query = wallet?.Transactions ?? Enumerable.Empty<Transaction>();
+        }
+        else
+        {
+            query = _context.Wallets.SelectMany(w => w.Transactions);
+        }
+
+        if (transactionType.HasValue)
+        {
+            query = query.Where(t => t.Category.TransactionType == transactionType.Value);
+        }
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(t => t.DateTime >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(t => t.DateTime <= endDate.Value);
+        }
+
+        query = query.OrderByDescending(t => t.DateTime);
+
+        foreach(var item in query)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return item;
+        }
     }
 }
