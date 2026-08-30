@@ -24,22 +24,22 @@ public class TxtReportExportStrategy : IReportExportStrategy
         var stream = new MemoryStream();
         var writer = new StreamWriter(stream, leaveOpen: true);
 
-        int totalWidth = properties.Length * (ColWidth + Etc.Length);
-        string separator = new string(RowSeparator, totalWidth);
+        int totalWidth = properties.Length * ColWidth + ((properties.Length - 1) * ColSeparator.Length);
+        string separator = new(RowSeparator, totalWidth);
 
         await writer.WriteLineAsync($"{reportName.ToUpper()}");
         await writer.WriteLineAsync($"{DateTime.Now}");
         await writer.WriteLineAsync(separator);
 
         var headers = string.Join(ColSeparator, properties.Select(p =>
-        TruncateOrPad(p.Name, totalWidth)));
+            TruncateOrPad(p.Name, ColWidth)));
         await writer.WriteLineAsync(headers);
         await writer.WriteLineAsync(separator);
 
         await foreach(var item in data)
         {
             var vals = properties.Select(p => 
-                TruncateOrPad(p.GetValue(item)?.ToString() ?? string.Empty, totalWidth));
+                TruncateOrPad(p.GetValue(item)?.ToString() ?? string.Empty, ColWidth));
 
             await writer.WriteLineAsync(string.Join(ColSeparator, vals));
         }
