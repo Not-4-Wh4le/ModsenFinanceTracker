@@ -2,14 +2,13 @@
 using ModsenFinanceTracker.Domain.Enums;
 using ModsenFinanceTracker.Domain.Events;
 using ModsenFinanceTracker.Domain.Exceptions;
-using System.Xml.Linq;
 
 namespace ModsenFinanceTracker.Domain.Entities;
 
 public class Wallet : AggregateRoot
 {
     private string _name;
-    private List<Transaction> _transactions = new();
+    private List<Transaction> _transactions = [];
 
     public const int MaxNameLength = 50;
 
