@@ -8,6 +8,8 @@ public class CsvReportExportStrategy : IReportExportStrategy
 {
     private const string Separator = ";";
     private const string ContentType = "text/csv";
+    private const string FileNameDateTimeFormat = "yyyyMMdd_HHmmss";
+
     public string Format => "csv";
 
     public async Task<ExportFileResult> ExportAsync<T>(
@@ -17,7 +19,7 @@ public class CsvReportExportStrategy : IReportExportStrategy
     {
         var properties = typeof(T).GetProperties();
         var stream = new MemoryStream();
-        var writer = new StreamWriter(stream, leaveOpen: true);
+        var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
         
         var header = string.Join(Separator, properties.Select(p => p.Name));
         
@@ -35,7 +37,7 @@ public class CsvReportExportStrategy : IReportExportStrategy
         return new ExportFileResult(
             stream,
             ContentType,
-            $"{reportName}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.{Format}");
+            $"{reportName}_{DateTime.UtcNow.ToString(FileNameDateTimeFormat)}.{Format}");
     }
 
     

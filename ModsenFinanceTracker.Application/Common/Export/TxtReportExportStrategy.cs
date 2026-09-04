@@ -12,6 +12,7 @@ public class TxtReportExportStrategy : IReportExportStrategy
     private const string ColSeparator = " | ";
     private const char RowSeparator = '-';
     private const int ColWidth = 25;
+    private const string FileNameDateTimeFormat = "yyyyMMdd_HHmmss";
 
     public string Format => "txt";
 
@@ -52,7 +53,7 @@ public class TxtReportExportStrategy : IReportExportStrategy
         return new ExportFileResult(
             stream,
             ContentType,
-            $"{reportName}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.{Format}");
+            $"{reportName}_{DateTime.UtcNow.ToString(FileNameDateTimeFormat)}.{Format}");
     }
 
     private string TruncateOrPad(string value, int maxLength)
