@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace ModsenFinanceTracker.TelegramBot.Commands;
 
-public interface IBotCommandHandler
+public interface IBotEndpoint
 {
     string CommandName { get; }
 

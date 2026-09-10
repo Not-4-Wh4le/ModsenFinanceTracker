@@ -2,14 +2,14 @@
 
 namespace ModsenFinanceTracker.TelegramBot.Commands;
 
-public class ExportCsvCommandHandler : BaseExportCommandHandler
+public class ExportCsvEndpoint : BaseExportEndpoint
 {
     public override string CommandName => "/export_csv";
     protected override string Format => "csv";
 
-    public ExportCsvCommandHandler(
+    public ExportCsvEndpoint(
         IMediator mediator,
-        ILogger<ExportCsvCommandHandler> logger)
+        ILogger<ExportCsvEndpoint> logger)
         : base(mediator, logger)
     {
     }

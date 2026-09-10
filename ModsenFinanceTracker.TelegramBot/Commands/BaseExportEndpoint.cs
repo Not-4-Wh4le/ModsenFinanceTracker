@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 
 namespace ModsenFinanceTracker.TelegramBot.Commands;
 
-public abstract class BaseExportCommandHandler : IBotCommandHandler
+public abstract class BaseExportEndpoint : IBotEndpoint
 {
     private const string GeneratingMessageTemplate = "Генерирую {0}-отчет...";
     private const string SuccessCaptionTemplate = "Ваш отчет в формате {0}";
@@ -17,7 +17,7 @@ public abstract class BaseExportCommandHandler : IBotCommandHandler
     public abstract string CommandName { get; }
     protected abstract string Format { get; }
 
-    protected BaseExportCommandHandler(IMediator mediator, ILogger logger)
+    protected BaseExportEndpoint(IMediator mediator, ILogger logger)
     {
         _mediator = mediator;
         _logger = logger;

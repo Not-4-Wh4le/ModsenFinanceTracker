@@ -18,7 +18,7 @@ builder.Services.AddSingleton<ITelegramBotClient>(
 
 builder.Services.AddSingleton(sp => new AppConfiguration("BYN", "data.json", "dd.MM.yyyy"));
 
-var handlerType = typeof(IBotCommandHandler);
+var handlerType = typeof(IBotEndpoint);
 var handlers = typeof(Program).Assembly
     .GetTypes()
     .Where(t => handlerType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);

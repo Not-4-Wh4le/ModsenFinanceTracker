@@ -13,12 +13,12 @@ public class UpdateHandler : IUpdateHandler
 {
     private const string UnknownCommandMessage = "Неизвестная команда.";
     private const string ApiErrorLogMessage = "Telegram API error";
-    private readonly Dictionary<string, IBotCommandHandler> _handlers;
+    private readonly Dictionary<string, IBotEndpoint> _handlers;
     private readonly TransactionDraft _draft;
     private readonly ILogger<UpdateHandler> _logger;
 
     public UpdateHandler(
-        IEnumerable<IBotCommandHandler> handlers,
+        IEnumerable<IBotEndpoint> handlers,
         TransactionDraft draft,
         ILogger<UpdateHandler> logger)
     {

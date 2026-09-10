@@ -2,14 +2,14 @@
 
 namespace ModsenFinanceTracker.TelegramBot.Commands;
 
-public class ExportTxtCommandHandler : BaseExportCommandHandler
+public class ExportTxtEndpoint : BaseExportEndpoint
 {
     public override string CommandName => "/export_txt";
     protected override string Format => "txt";
 
-    public ExportTxtCommandHandler(
+    public ExportTxtEndpoint(
         IMediator mediator,
-        ILogger<ExportTxtCommandHandler> logger)
+        ILogger<ExportTxtEndpoint> logger)
         : base(mediator, logger)
     {
     }
