@@ -14,5 +14,11 @@ namespace ModsenFinanceTracker.Application.Common.Interfaces.Repositories
             int pageNumber,
             int pageSize,
             CancellationToken cancellationToken = default);
+        IAsyncEnumerable<Transaction> GetTransactionsAsync(
+            Guid? walletId,
+            TransactionType? transactionType,
+            DateTime? startDate,
+            DateTime? endDate,
+            CancellationToken cancellationToken = default);
     }
 }
