@@ -29,11 +29,14 @@ public abstract class BaseExportEndpoint : IBotEndpoint
         CancellationToken cancellationToken)
     {
         long chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
-        if (chatId == 0) return;
+        if (chatId == 0)
+        {
+            return;
+        }
 
         await botClient.SendMessage(
-            chatId: chatId,
-            text: string.Format(GeneratingMessageTemplate, Format),
+            chatId,
+            string.Format(GeneratingMessageTemplate, Format),
             cancellationToken: cancellationToken);
 
         try
@@ -47,9 +50,9 @@ public abstract class BaseExportEndpoint : IBotEndpoint
                 var inputFile = InputFile.FromStream(exportResult.FileContents, exportResult.FileName);
 
                 await botClient.SendDocument(
-                    chatId: chatId,
-                    document: inputFile,
-                    caption: string.Format(SuccessCaptionTemplate, Format),
+                    chatId,
+                    inputFile,
+                    string.Format(SuccessCaptionTemplate, Format),
                     cancellationToken: cancellationToken);
             }
         }
@@ -58,8 +61,8 @@ public abstract class BaseExportEndpoint : IBotEndpoint
             _logger.LogError(ex, "Ошибка при экспорте файла формата {Format}", Format);
 
             await botClient.SendMessage(
-                chatId: chatId,
-                text: ErrorMessage,
+                chatId,
+                ErrorMessage,
                 cancellationToken: cancellationToken);
         }
     }

@@ -1,7 +1,4 @@
-﻿using MediatR;
-using ModsenFinanceTracker.Application.Common.Features.Transactions.Queries.ExportTransactions;
-using ModsenFinanceTracker.Application.Common.Features.Transactions.Queries.GetTransactionsPaged;
-using ModsenFinanceTracker.TelegramBot.Commands;
+﻿using ModsenFinanceTracker.TelegramBot.Commands;
 using ModsenFinanceTracker.TelegramBot.States;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -33,7 +30,10 @@ public class UpdateHandler : IUpdateHandler
         CancellationToken cancellationToken)
     {
         long chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
-        if (chatId == 0) return;
+        if (chatId == 0)
+        {
+            return;
+        }
 
         var messageText = update.Message?.Text?.Trim();
 
@@ -44,6 +44,7 @@ public class UpdateHandler : IUpdateHandler
                 chatId: chatId,
                 text: "Операция отменена",
                 cancellationToken: cancellationToken);
+
             return;
         }
 
@@ -52,6 +53,7 @@ public class UpdateHandler : IUpdateHandler
             if (_handlers.TryGetValue("/add", out var addHandler))
             {
                 await addHandler.HandleAsync(botClient, update, cancellationToken);
+
                 return;
             }
         }
@@ -67,8 +69,8 @@ public class UpdateHandler : IUpdateHandler
             else
             {
                 await botClient.SendMessage(
-                    chatId: chatId,
-                    text: UnknownCommandMessage,
+                    chatId,
+                    UnknownCommandMessage,
                     cancellationToken: cancellationToken);
             }
         }

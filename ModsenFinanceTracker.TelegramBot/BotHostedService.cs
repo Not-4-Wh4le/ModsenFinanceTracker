@@ -23,7 +23,7 @@ public class BotHostedService : BackgroundService
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var receiverOptions = new ReceiverOptions
         {
@@ -31,13 +31,13 @@ public class BotHostedService : BackgroundService
             DropPendingUpdates = true 
         };
 
-        User me = await _botClient.GetMe(stoppingToken);
+        User me = await _botClient.GetMe(cancellationToken);
         _logger.LogInformation("{FirstName} (@{Username}) running", me.FirstName, me.Username);
 
         await _botClient.ReceiveAsync(
-            updateHandler: _updateHandler,
-            receiverOptions: receiverOptions,
-            cancellationToken: stoppingToken
+            _updateHandler,
+            receiverOptions,
+            cancellationToken
         );
     }
 }
