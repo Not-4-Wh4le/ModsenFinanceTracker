@@ -52,14 +52,19 @@ public class AddTransactionEndpoint : IBotEndpoint
         Update update, 
         CancellationToken cancellationToken)
     {
-        var chatId = update.Message?.Chat.Id ?? update.CallbackQuery!.Message!.Chat.Id;
+        var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id;
+
+        if (chatId == null)
+        {
+            return;
+        }
 
         if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message
             && update.Message!.Text == CommandNameValue)
         {
             _draft.Reset();
             _draft.Step = AddTransactionStep.AwaitingWallet;
-            await AskForWalletAsync(botClient, chatId, cancellationToken);
+            await AskForWalletAsync(botClient, chatId.Value, cancellationToken);
 
             return;
         }
@@ -108,7 +113,7 @@ public class AddTransactionEndpoint : IBotEndpoint
     private async Task ProcessWalletSelectionAsync(
         ITelegramBotClient botClient, 
         Update update, 
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         if (update.CallbackQuery == null 
             || !update.CallbackQuery.Data!.StartsWith(WalletCallbackPrefix))
@@ -135,7 +140,7 @@ public class AddTransactionEndpoint : IBotEndpoint
             message.MessageId,
             SelectTypeMessage,
             replyMarkup: new InlineKeyboardMarkup(buttons),
-            cancellationToken: ct);
+            cancellationToken: cancellationToken);
     }
 
     private async Task ProcessTypeSelectionAsync(
@@ -172,7 +177,9 @@ public class AddTransactionEndpoint : IBotEndpoint
                 out var amount)
             || amount <= 0)
         {
-            await botClient.SendMessage(chatId, InvalidAmountMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(
+                chatId, InvalidAmountMessage, 
+                cancellationToken: cancellationToken);
 
             return;
         }
@@ -189,6 +196,7 @@ public class AddTransactionEndpoint : IBotEndpoint
                 chatId, 
                 CategoriesNotFoundMessage, 
                 cancellationToken: cancellationToken);
+
             _draft.Reset();
 
             return;
@@ -199,11 +207,16 @@ public class AddTransactionEndpoint : IBotEndpoint
         var buttons = categories.Items.Select(c =>
             new[] { InlineKeyboardButton.WithCallbackData(c.Name, $"{CategoryCallbackPrefix}{c.Id}") });
 
-        await botClient.SendMessage(chatId, SelectCategoryMessage,
+        await botClient.SendMessage(
+            chatId, 
+            SelectCategoryMessage,
             replyMarkup: new InlineKeyboardMarkup(buttons), cancellationToken: cancellationToken);
     }
 
-    private async Task ProcessCategorySelectionAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    private async Task ProcessCategorySelectionAsync(
+        ITelegramBotClient botClient, 
+        Update update, 
+        CancellationToken cancellationToken)
     {
         if (update.CallbackQuery == null || !update.CallbackQuery.Data!.StartsWith(CategoryCallbackPrefix))
         {
