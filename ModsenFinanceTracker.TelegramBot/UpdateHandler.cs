@@ -10,16 +10,19 @@ public class UpdateHandler : IUpdateHandler
 {
     private const string UnknownCommandMessage = "Неизвестная команда.";
     private const string ApiErrorLogMessage = "Telegram API error";
+    private const string CancelCommand = "/cancel";
+    private const string CancelOperationMessage = "Операция отменена";
+    private const string AddCommand = "/add";
     private readonly Dictionary<string, IBotEndpoint> _handlers;
     private readonly TransactionDraft _draft;
     private readonly ILogger<UpdateHandler> _logger;
 
     public UpdateHandler(
-        IEnumerable<IBotEndpoint> handlers,
+        IEnumerable<IBotEndpoint> endpoints,
         TransactionDraft draft,
         ILogger<UpdateHandler> logger)
     {
-        _handlers = handlers.ToDictionary(h => h.CommandName.ToLower(), h => h);
+        _handlers = endpoints.ToDictionary(h => h.CommandName.ToLower(), h => h);
         _draft = draft;
         _logger = logger;
     }
@@ -37,12 +40,12 @@ public class UpdateHandler : IUpdateHandler
 
         var messageText = update.Message?.Text?.Trim();
 
-        if (messageText == "/cancel")
+        if (messageText == CancelCommand)
         {
             _draft.Reset();
             await botClient.SendMessage(
                 chatId: chatId,
-                text: "Операция отменена",
+                text: CancelOperationMessage,
                 cancellationToken: cancellationToken);
 
             return;
@@ -50,7 +53,7 @@ public class UpdateHandler : IUpdateHandler
 
         if (_draft.IsActive)
         {
-            if (_handlers.TryGetValue("/add", out var addHandler))
+            if (_handlers.TryGetValue(AddCommand, out var addHandler))
             {
                 await addHandler.HandleAsync(botClient, update, cancellationToken);
 
