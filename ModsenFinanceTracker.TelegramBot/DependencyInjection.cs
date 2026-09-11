@@ -8,15 +8,26 @@ namespace ModsenFinanceTracker.TelegramBot;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddTelegramBot(this IServiceCollection services, IConfiguration configuration)
+    private const string TelegramTokenKey = "TelegramBot:Token";
+    private const string MissingTokenErrorMessage = "TelegramBot:Token not specified in configuration";
+    
+    public static IServiceCollection AddTelegramBot(
+        this IServiceCollection services, 
+        IConfiguration configuration)
     {
-        string botToken = configuration["TelegramBot:Token"]
-            ?? throw new InvalidOperationException("TelegramBot:Token not specified");
+        string botToken = configuration[TelegramTokenKey]
+            ?? throw new InvalidOperationException(MissingTokenErrorMessage);
 
         services.AddSingleton<ITelegramBotClient>(
             sp => new TelegramBotClient(botToken));
 
-        services.AddSingleton(sp => new AppConfiguration("BYN", "data.json", "dd.MM.yyyy"));
+        var appConfig = configuration.GetSection(nameof(AppConfiguration)).Get<AppConfiguration>()
+            ?? new AppConfiguration(
+                    AppConfiguration.DefaultCurrency, 
+                    AppConfiguration.DefaultDataFilePath, 
+                    AppConfiguration.DefaultDateFormat); 
+
+        services.AddSingleton(appConfig);
 
         var handlerType = typeof(IBotEndpoint);
         var handlers = typeof(Program).Assembly
