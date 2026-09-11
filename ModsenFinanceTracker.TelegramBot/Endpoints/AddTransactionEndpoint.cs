@@ -23,22 +23,18 @@ public class AddTransactionEndpoint : IBotEndpoint
     private const string EnterDescriptionMessage = "Введите описание:";
     private const string DefaultDescription = "Транзакция из Telegram";
     private const string SuccessMessage = "Транзакция добавлена";
-
+    private static readonly string[] SkipSymbols = ["-", "пропустить", "skip"];
     private const string WalletCallbackPrefix = "wallet_";
     private const string TypeCallbackPrefix = "type_";
     private const string CategoryCallbackPrefix = "cat_";
-
     private const string IncomeTypeName = "Income";
     private const string ExpenseTypeName = "Expense";
     private const string IncomeDisplayName = "Доход";
     private const string ExpenseDisplayName = "Расход";
-
     private const int DefaultPageNumber = 1;
     private const int DefaultPageSize = 50;
-
     private readonly IMediator _mediator;
     private readonly TransactionDraft _draft;
-
     public string CommandName => CommandNameValue;
 
     public AddTransactionEndpoint(IMediator mediator, TransactionDraft draft)
@@ -239,7 +235,11 @@ public class AddTransactionEndpoint : IBotEndpoint
     {
         var chatId = update.Message!.Chat.Id;
         var descriptionInput = update.Message.Text?.Trim();
-        var description = (string.IsNullOrEmpty(descriptionInput) || descriptionInput == "-")
+        
+        var isSkipRequested = string.IsNullOrEmpty(descriptionInput)
+            || SkipSymbols.Contains(descriptionInput);
+        
+        var description = isSkipRequested
             ? DefaultDescription
             : descriptionInput;
 
