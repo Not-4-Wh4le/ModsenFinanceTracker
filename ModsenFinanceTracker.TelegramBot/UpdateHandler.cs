@@ -1,4 +1,4 @@
-﻿using ModsenFinanceTracker.TelegramBot.Commands;
+﻿using ModsenFinanceTracker.TelegramBot.Endpoints;
 using ModsenFinanceTracker.TelegramBot.States;
 using Telegram.Bot;
 using Telegram.Bot.Polling;

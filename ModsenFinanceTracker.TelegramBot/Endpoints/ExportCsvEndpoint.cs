@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace ModsenFinanceTracker.TelegramBot.Commands;
+namespace ModsenFinanceTracker.TelegramBot.Endpoints;
 
 public class ExportCsvEndpoint : BaseExportEndpoint
 {

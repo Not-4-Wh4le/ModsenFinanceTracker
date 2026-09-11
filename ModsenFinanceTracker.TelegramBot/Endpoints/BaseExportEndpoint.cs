@@ -3,7 +3,7 @@ using ModsenFinanceTracker.Application.Common.Features.Transactions.Queries.Expo
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace ModsenFinanceTracker.TelegramBot.Commands;
+namespace ModsenFinanceTracker.TelegramBot.Endpoints;
 
 public abstract class BaseExportEndpoint : IBotEndpoint
 {

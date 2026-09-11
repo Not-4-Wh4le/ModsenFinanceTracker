@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace ModsenFinanceTracker.TelegramBot.Commands;
+namespace ModsenFinanceTracker.TelegramBot.Endpoints;
 
 public interface IBotEndpoint
 {
