@@ -1,6 +1,8 @@
-﻿namespace ModsenFinanceTracker.Domain.Common.Interfaces;
+﻿using MediatR;
 
-public interface IDomainEvent 
+namespace ModsenFinanceTracker.Domain.Common.Interfaces;
+
+public interface IDomainEvent : INotification
 {
     DateTime Timestamp { get; }
 }
