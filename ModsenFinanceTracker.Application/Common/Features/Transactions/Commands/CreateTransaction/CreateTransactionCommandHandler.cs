@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using ModsenFinanceTracker.Application.Common.Interfaces.Events;
 using ModsenFinanceTracker.Application.Common.Interfaces.Repositories;
 using ModsenFinanceTracker.Application.Common.Interfaces.TransactionFactory;
 
@@ -9,14 +10,17 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
     private readonly ICategoryRepository _categoryRepository;
     private readonly IWalletRepository _walletRepository;
     private readonly ITransactionFactoryResolver _transactionFactoryResolver;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
     public CreateTransactionCommandHandler(
         ICategoryRepository categoryRepository,
         IWalletRepository walletRepository,
-        ITransactionFactoryResolver transactionFactoryResolver)
+        ITransactionFactoryResolver transactionFactoryResolver,
+        IDomainEventDispatcher domainEventDispatcher)
     {
         _categoryRepository = categoryRepository;
         _walletRepository = walletRepository;
         _transactionFactoryResolver = transactionFactoryResolver;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     public async Task<Guid> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
@@ -45,7 +49,10 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             request.DateTime);
 
         wallet.AddTransaction(transaction);
+        
         await _walletRepository.SaveAsync(wallet, cancellationToken);
+
+        await _domainEventDispatcher.DispatchAndClearAsync(wallet, cancellationToken);
 
         return transaction.Id;
     }
