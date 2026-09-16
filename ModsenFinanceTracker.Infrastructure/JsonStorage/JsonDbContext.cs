@@ -12,6 +12,7 @@ namespace ModsenFinanceTracker.Infrastructure.JsonStorage;
 
 public class JsonDbContext
 {
+    public const string TransactionsFieldName = "_transactions";
     private readonly string _filePath;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly JsonSerializerOptions _jsonOptions;
@@ -136,7 +137,7 @@ public class JsonDbContext
 
         foreach(var wallet in walletGroups)
         {
-            wallet.Wallet.SetPrivateField("_transactions", wallet.Transactions);
+            wallet.Wallet.SetPrivateField(TransactionsFieldName, wallet.Transactions);
         }
         
     }
