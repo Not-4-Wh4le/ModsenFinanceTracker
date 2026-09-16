@@ -12,14 +12,19 @@ public static class ReflectionExtension
         string fieldName,
         TValue value)
     {
-        var type = typeof(TEntity);
+        var entityType = entity.GetType();
 
-        var field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)
-            ?? throw new InvalidOperationException($"Field {fieldName} not found");
+        var field = entityType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException($"Field {fieldName} not found in '{entityType.Name}'");
+
+        var valueType = value?.GetType() ?? typeof(TValue);
 
         if (!field.FieldType.IsAssignableFrom(typeof(TValue)))
         {
-            throw new ArgumentException();
+            throw new ArgumentException(
+                $"Cannot assign value of type '{valueType.Name}' " +
+                $"to field '{fieldName}' of type '{field.FieldType.Name}'" +
+                $" on '{entityType.Name}'", nameof(value));
         }
 
         field.SetValue(entity, value);
