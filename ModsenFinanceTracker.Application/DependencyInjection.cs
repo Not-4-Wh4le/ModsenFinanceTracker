@@ -6,6 +6,8 @@ using ModsenFinanceTracker.Application.Common.Behavior;
 using ModsenFinanceTracker.Application.Common.Interfaces.TransactionFactory;
 using ModsenFinanceTracker.Application.Common.TransactionFactoryImpl;
 using System.Reflection;
+using ModsenFinanceTracker.Application.Common.Interfaces.Events;
+using ModsenFinanceTracker.Application.Common.Events;
 
 namespace ModsenFinanceTracker.Application;
 
@@ -28,6 +30,8 @@ public static class DependencyInjection
             conf.RegisterServicesFromAssemblies(assembly);
             conf.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidatorBehavior<,>));
         });
+
+        services.AddTransient<IDomainEventDispatcher, DomainEventDispatcher>();
 
         return services;
     }

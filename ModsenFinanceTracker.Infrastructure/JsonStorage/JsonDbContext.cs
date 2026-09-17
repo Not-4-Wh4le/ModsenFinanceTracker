@@ -2,6 +2,7 @@
 using ModsenFinanceTracker.Domain.Configutaion;
 using ModsenFinanceTracker.Domain.Entities;
 using ModsenFinanceTracker.Domain.Enums;
+using ModsenFinanceTracker.Infrastructure.Extension;
 using ModsenFinanceTracker.Infrastructure.JsonStorage.Models;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -11,6 +12,7 @@ namespace ModsenFinanceTracker.Infrastructure.JsonStorage;
 
 public class JsonDbContext
 {
+    public const string TransactionsFieldName = "_transactions";
     private readonly string _filePath;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly JsonSerializerOptions _jsonOptions;
@@ -100,32 +102,44 @@ public class JsonDbContext
             .Select(w => new Wallet(w.Id, w.Name))
             .ToList();
 
-        foreach(var t in snapshot.Transactions)
+        var transactions = new List<Transaction>();
+
+        var walletDict = Wallets.ToDictionary(w => w.Id);
+        var categoryDict = Categories.ToDictionary(c => c.Id);
+
+        var walletGroups = snapshot.Transactions
+            .Where(t => 
+                walletDict.ContainsKey(t.WalletId)
+                && categoryDict.ContainsKey(t.CategoryId))
+            .GroupBy(t => t.WalletId)
+            .Select(g =>
+                new
+                {
+                    Wallet = walletDict[g.Key],
+                    Transactions = g
+                        .Select(t =>
+                        {
+                            var type = Enum.Parse<TransactionType>(t.TransactionType);
+                            var factory = _factoryResolver.GetFactory(type);
+                            var category = categoryDict[t.CategoryId];
+
+                            var transaction = factory.Create(
+                                t.Id,
+                                t.Amount,
+                                category,
+                                t.Description,
+                                t.DateTime);
+
+                            return transaction;
+                        }).ToList()
+                }
+            ).ToList();
+
+        foreach(var wallet in walletGroups)
         {
-            var wallet = Wallets.FirstOrDefault(w => w.Id == t.WalletId);
-            var category = Categories.FirstOrDefault(c => c.Id == t.CategoryId);
-
-            if (category == null || wallet == null)
-            {
-                continue;
-            }
-
-            if (!Enum.TryParse<TransactionType>(t.TransactionType, out var type))
-            {
-                continue;
-            }
-
-            var factory = _factoryResolver.GetFactory(type);
-
-            var transaction = factory.Create(
-                t.Id,
-                t.Amount,
-                category,
-                t.Description,
-                t.DateTime);
-
-            wallet.AddTransaction(transaction);
+            wallet.Wallet.SetPrivateField(TransactionsFieldName, wallet.Transactions);
         }
+        
     }
 
     private DataSnapshot MapToSnapshot()
