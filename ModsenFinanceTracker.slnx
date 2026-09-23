@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="ModsenFinanceTracker.Application/ModsenFinanceTracker.Application.csproj" Id="b2af3b88-794c-47ca-9705-2ecc6bf02cf0" />
   <Project Path="ModsenFinanceTracker.Domain/ModsenFinanceTracker.Domain.csproj" />
+  <Project Path="ModsenFinanceTracker.Infrastructure/ModsenFinanceTracker.Infrastructure.csproj" Id="931bf616-61df-401e-b48b-29267ff7bb49" />
+  <Project Path="ModsenFinanceTracker.TelegramBot/ModsenFinanceTracker.TelegramBot.csproj" Id="b8d41eb4-ccee-4942-96ea-e78623d9104f" />
 </Solution>
